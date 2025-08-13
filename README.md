@@ -32,16 +32,20 @@ terraform/
 ─ glue_job.tf
 ─ glue_connection_to_redshift.tf
 ─ redshift.tf
+
 boto3_scripts/
 - upload_data_to_s3.py
 - upload_glue_code.py                # uploads etl_code/glue_etl_code.py to S3
 - start_crawler_team2.py             # starts crawler & waits until READY
 - trigger_glue_job.py                # starts Glue job; prints JobRunId & status
 - main_filt_team2.py                 # runs the 4 steps in order
+
 etl_code/
 glue_etl_code.py                   # PySpark ETL (runs in Glue)
+
 data/
 - sales_data.csv                     # ~24 MB sample (dd-MM-yyyy dates)
+
 README.md
 
 Prerequisites
