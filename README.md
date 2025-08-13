@@ -98,16 +98,16 @@ python boto3_scripts/main_filt_team2.py
 Or step by step:
 
 
-# 1) Upload sample data to S3 (to s3://<bucket>/raw/sales_data.csv)
+1) Upload sample data to S3 (to s3://<bucket>/raw/sales_data.csv)
 python boto3_scripts/upload_data_to_s3.py
 
-# 2) Upload Glue ETL script to S3 (to s3://<bucket>/glue_scripts/glue_etl_code.py)
+2) Upload Glue ETL script to S3 (to s3://<bucket>/glue_scripts/glue_etl_code.py)
 python boto3_scripts/upload_glue_code.py
 
-# 3) Start the Glue crawler and wait for READY
+3) Start the Glue crawler and wait for READY
 python boto3_scripts/start_crawler_team2.py
 
-# 4) Trigger the Glue ETL job
+4) Trigger the Glue ETL job
 python boto3_scripts/trigger_glue_job.py
 3) Validate in Redshift
 Connect to Redshift (use the endpoint/output from Terraform) and run:
