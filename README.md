@@ -5,7 +5,7 @@ Batch ETL that loads sales data from S3 → Glue (Spark) → Redshift.
 Infra is provisioned with Terraform; orchestration steps use small boto3 scripts.
 
 What it does
-Stores raw CSVs in S3 (s3://<bucket>/raw/)
+Stores raw CSVs in S3 (s3://batch-etl-pipeline-team2/raw/)
 
 Glue Crawler catalogs raw data to the Glue Data Catalog
 
@@ -66,7 +66,7 @@ terraform init
 terraform apply -auto-approve
 Outputs:
 
-S3 bucket (e.g., batch-etl-pipeline-team2)
+S3 bucket (batch-etl-pipeline-team2)
 
 Glue database + crawler
 
@@ -137,5 +137,3 @@ LIMIT 10;
 SELECT COUNT(*) AS null_dates
 FROM public.sales_data_team2
 WHERE order_date IS NULL;
-Target schema (recommended):
-
