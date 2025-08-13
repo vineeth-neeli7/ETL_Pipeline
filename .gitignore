@@ -1,0 +1,17 @@
+# Terraform
+.terraform/
+terraform.tfstate*
+.terraform.lock.hcl
+*.tfvars
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
