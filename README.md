@@ -57,7 +57,6 @@ Terraform ≥ 1.5
 
 Python ≥ 3.10 and pip install boto3
 
-ℹ️ The Redshift password is currently hard-coded in terraform/redshift.tf. Keep this repo private or move it into terraform.tfvars.
 
 1) Deploy infrastructure (Terraform)
 From the terraform/ folder:
