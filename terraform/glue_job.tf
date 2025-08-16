@@ -12,12 +12,14 @@ resource "aws_glue_job" "etl_job_team2" {
     "--TempDir"      = "s3://batch-etl-pipeline-team2/temp/"
     "--job-language" = "python"
     "--enable-continuous-cloudwatch-log" = "true"
+    "--job-bookmark-option"              = "job-bookmark-disable"  # full-batch reloads
+    "--conf" = "spark.sql.shuffle.partitions=96 --conf spark.default.parallelism=96 --conf spark.sql.files.maxPartitionBytes=64m"
   }
 
   glue_version = "3.0"
   max_retries  = 1
-  timeout      = 10
-  number_of_workers = 2
+  timeout      = 35
+  number_of_workers = 8
   worker_type       = "G.1X"
 }
 
