@@ -1,139 +1,175 @@
-# ETL_Pipeline
+# 🚀 Team2 Batch ETL Pipeline
 
-Team2 Batch ETL Pipeline (AWS Glue + Redshift)
-Batch ETL that loads sales data from S3 → Glue (Spark) → Redshift.
-Infra is provisioned with Terraform; orchestration steps use small boto3 scripts.
+This project builds an automated **Batch ETL Pipeline** using **AWS Glue + Redshift + Terraform** to process and load sales data from **Amazon S3 → AWS Glue (PySpark) → Amazon Redshift**.
 
-What it does
-Stores raw CSVs in S3 (s3://batch-etl-pipeline-team2/raw/)
+Infrastructure is provisioned via Terraform, and the workflow is orchestrated using Python `boto3` scripts.
 
-Glue Crawler catalogs raw data to the Glue Data Catalog
+---
 
-Glue ETL job (PySpark):
+## 📌 Key Features
 
-casts numeric fields, fills small nulls (unit_price → 0.0, region → "unknown")
+- 🗂️ **Stores raw sales data** in S3
+- 🔍 **Glue Crawler** auto-catalogs data to the Glue Data Catalog
+- 🧹 **Glue ETL Job**:
+  - Parses and cleans raw CSVs
+  - Handles multiple date formats
+  - Derives calculated columns (`total_price`, `order_year`)
+  - Fills nulls and casts data types
+  - Removes duplicates
+- 🛢️ Loads cleaned data into **Redshift** table: `public.sales_data_team2`
 
-robustly parses order_date in dd-MM-yyyy (fallbacks for d-M-yyyy, dd/MM/yyyy, yyyy-MM-dd)
+---
 
-derives order_year
+## 🧱 Project Structure
 
-computes total_price = quantity * unit_price (decimal, 2 dp)
-
-drops duplicates and rows with unparseable dates
-
-Loads to Redshift table public.sales_data_team2
-
-Repo layout
-
+```
 ETL_Pipeline/
-terraform/
-─ s3.tf
-─ glue.tf
-─ glue_job.tf
-─ glue_connection_to_redshift.tf
-─ redshift.tf
+├── terraform/                  # Infrastructure-as-Code (S3, Redshift, Glue)
+├── boto3_scripts/             # Orchestration scripts for pipeline steps
+├── etl_code/                  # Glue ETL PySpark code
+├── data/                      # Sample CSV data
+├── README.md
+```
 
-boto3_scripts/
-- upload_data_to_s3.py
-- upload_glue_code.py                # uploads etl_code/glue_etl_code.py to S3
-- start_crawler_team2.py             # starts crawler & waits until READY
-- trigger_glue_job.py                # starts Glue job; prints JobRunId & status
-- main_filt_team2.py                 # runs the 4 steps in order
+### 📂 `boto3_scripts/`
 
-etl_code/
-glue_etl_code.py                   # PySpark ETL (runs in Glue)
+- `upload_data_to_s3.py` – Uploads sample data to S3
+- `upload_duplicate_file_to_s3.py` – Uploads multiple files to simulate 5GB data
+- `upload_glue_code.py` – Uploads PySpark ETL code to S3
+- `start_crawler_team2.py` – Starts and monitors Glue Crawler
+- `trigger_glue_job.py` – Triggers Glue ETL job
+- `main_filt_team2.py` – Runs all steps sequentially
 
-data/
-- sales_data.csv                     # ~24 MB sample (dd-MM-yyyy dates)
+---
 
-README.md
+## ⚙️ Tech Stack
 
-Prerequisites
-AWS account with permissions for S3, Glue, IAM, Redshift.
+| Service      | Usage                             |
+|--------------|------------------------------------|
+| **AWS S3**   | Raw data storage (CSV)             |
+| **AWS Glue** | Crawler + ETL (PySpark) processing |
+| **Redshift** | Data warehouse for final table     |
+| **Terraform**| Infra provisioning                 |
+| **Boto3**    | Python-based orchestration         |
 
-AWS CLI configured (aws configure).
+---
 
-Terraform ≥ 1.5
+## 🚧 Prerequisites
 
-Python ≥ 3.10 and pip install boto3
+- AWS account with access to **S3, Glue, Redshift, IAM**
+- AWS CLI configured via `aws configure`
+- Terraform ≥ 1.5
+- Python ≥ 3.10 with `boto3` installed
 
+```bash
+pip install boto3
+```
 
-1) Deploy infrastructure (Terraform)
-From the terraform/ folder:
+---
 
+## 📦 Deployment Steps
 
+### 1. 🚀 Deploy Infrastructure via Terraform
+
+```bash
+cd terraform/
 terraform init
 terraform apply -auto-approve
-Outputs:
+```
 
-S3 bucket (batch-etl-pipeline-team2)
+> 🔧 This provisions:
+> - S3 bucket
+> - Glue database, crawler, and ETL job
+> - Redshift cluster with IAM roles
 
-Glue database + crawler
+💡 *Edit `redshift.tf` if your VPC/Subnet IDs differ*
 
-Glue job glue-etl-job-team2
+---
 
-Redshift cluster redshift-cluster-sales-data-team2 (+ endpoint)
+### 2. 📥 Create Redshift Table
 
-If your VPC/Subnet IDs are different, edit them in redshift.tf before apply.
+Before running the pipeline, execute this SQL on Redshift:
 
-2) Run a query to Create a table/ schema in redshift table public.sales_data_team2 
-CREATE TABLE IF NOT EXISTS public.sales_data_team2 (
-  order_id     BIGINT,
-  customer_id  VARCHAR(256),
+```sql
+CREATE TABLE public.sales_data_team2 (
+  sk BIGINT IDENTITY(1,1),    
+  order_id BIGINT,
+  customer_id VARCHAR(256),
   product_name VARCHAR(256),
-  region       VARCHAR(64),
-  quantity     BIGINT,
-  unit_price   NUMERIC(18,2),
-  total_price  NUMERIC(18,2),
-  order_date   DATE,
-  order_year   INT
-);
+  region VARCHAR(64),
+  quantity BIGINT,
+  unit_price Numeric(12,2),
+  total_price NUMERIC(14,2),
+  order_date DATE,
+  order_year INT
+ );
+```
 
+---
 
-3) Run the pipeline (boto3 scripts)
-From the repo root (or boto3_scripts/), either run end-to-end:
+### 3. 🛠️ Run the ETL Pipeline
 
-
+#### ✅ One-Click (End-to-End)
+```bash
 python boto3_scripts/main_filt_team2.py
-Or step by step:
+```
 
+#### 🔍 Or Step-by-Step
 
-1) Upload sample data to S3 (to s3://<bucket>/raw/sales_data.csv)
+```bash
+# 1. Upload raw CSV to S3
 python boto3_scripts/upload_data_to_s3.py
 
-2) Upload Glue ETL script to S3 (to s3://<bucket>/glue_scripts/glue_etl_code.py)
+# 2. Upload PySpark ETL script to S3
 python boto3_scripts/upload_glue_code.py
 
-3) Start the Glue crawler and wait for READY
+# 3. Start Glue Crawler
 python boto3_scripts/start_crawler_team2.py
 
-4) Trigger the Glue ETL job
+# 4. Trigger Glue Job
 python boto3_scripts/trigger_glue_job.py
-3) Validate in Redshift
-Connect to Redshift (use the endpoint/output from Terraform) and run:
+```
 
+---
 
--- row count
-SELECT COUNT(*) AS rows_loaded FROM public.sales_data_team2;
+## 🧪 Validate in Redshift
 
--- date coverage
-SELECT MIN(order_date) AS min_date, MAX(order_date) AS max_date
-FROM public.sales_data_team2;
+Connect to Redshift and run:
 
--- by year
-SELECT order_year, COUNT(*) AS n
-FROM public.sales_data_team2
-GROUP BY order_year
-ORDER BY order_year;
+```sql
+-- Row count
+SELECT * FROM public.sales_data_team2 Limit 10;
 
--- quick spot check
-SELECT order_id, customer_id, product_name, region,
-       quantity, unit_price, total_price, order_date, order_year
-FROM public.sales_data_team2
-ORDER BY order_date DESC
-LIMIT 10;
+-- Date coverage
+SELECT MIN(order_date), MAX(order_date) FROM public.sales_data_team2;
 
--- check: no null dates
-SELECT COUNT(*) AS null_dates
-FROM public.sales_data_team2
-WHERE order_date IS NULL;
+-- Records per year
+SELECT order_year, COUNT(*) FROM public.sales_data_team2 GROUP BY order_year;
+
+-- Sample data
+SELECT * FROM public.sales_data_team2 ORDER BY order_date DESC LIMIT 10;
+
+-- Null date check
+SELECT COUNT(*) FROM public.sales_data_team2 WHERE order_date IS NULL;
+```
+
+---
+
+## 📚 Learnings & Highlights
+
+- Understood AWS Glue DPUs and runtime costing
+- Learned schema inference via Glue Crawlers
+- Handled multiple date parsing edge cases in PySpark
+- Explored Redshift’s data casting and performance behavior
+- Calculated total_price, year-wise aggregation for business insight
+- Demonstrated how 5GB of data was generated and processed via `upload_duplicate_file_to_s3.py`
+
+---
+
+## 💰 AWS Cost Summary (Example)
+
+| Component      | Usage                              | Estimated Cost |
+|----------------|------------------------------------|----------------|
+| **S3**         | 5 GB of storage                    | ~$0.12/month   |
+| **Glue Job**   | 8 DPUs x 23 mins = ~3.06 DPU-Hours | ~$1.34         |
+| **Redshift**   | `ra3.xlplus` node (1 hour)         | ~$1.09/hour    |
