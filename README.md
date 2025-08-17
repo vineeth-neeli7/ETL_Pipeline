@@ -166,7 +166,7 @@ SELECT COUNT(*) FROM public.sales_data_team2 WHERE order_date IS NULL;
 
 ---
 
-## 💰 AWS Cost Summary (Example)
+## 💰 AWS Cost Summary (Estimation)
 
 | Component      | Usage                              | Estimated Cost |
 |----------------|------------------------------------|----------------|
