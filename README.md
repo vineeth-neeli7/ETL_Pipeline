@@ -38,7 +38,7 @@ ETL_Pipeline/
 - `upload_glue_code.py` – Uploads PySpark ETL code to S3
 - `start_crawler_team2.py` – Starts and monitors Glue Crawler
 - `trigger_glue_job.py` – Triggers Glue ETL job
-- `main_filt_team2.py` – Runs all steps sequentially
+- `main_file_team2.py` – Runs all steps sequentially
 
 ---
 
@@ -111,7 +111,7 @@ CREATE TABLE public.sales_data_team2 (
 
 #### One-Click (End-to-End)
 ```bash
-python boto3_scripts/main_filt_team2.py
+python boto3_scripts/main_file_team2.py
 ```
 
 #### Or Step-by-Step
