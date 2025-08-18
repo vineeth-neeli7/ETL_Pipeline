@@ -1,4 +1,4 @@
-# 🚀 Team2 Batch ETL Pipeline
+# Team2 Batch ETL Pipeline
 
 This project builds an automated **Batch ETL Pipeline** using **AWS Glue + Redshift + Terraform** to process and load sales data from **Amazon S3 → AWS Glue (PySpark) → Amazon Redshift**.
 
@@ -6,21 +6,21 @@ Infrastructure is provisioned via Terraform, and the workflow is orchestrated us
 
 ---
 
-## 📌 Key Features
+## Key Features
 
-- 🗂️ **Stores raw sales data** in S3
-- 🔍 **Glue Crawler** auto-catalogs data to the Glue Data Catalog
-- 🧹 **Glue ETL Job**:
+-  **Stores raw sales data** in S3
+-  **Glue Crawler** auto-catalogs data to the Glue Data Catalog
+-  **Glue ETL Job**:
   - Parses and cleans raw CSVs
   - Handles multiple date formats
   - Derives calculated columns (`total_price`, `order_year`)
   - Fills nulls and casts data types
   - Removes duplicates
-- 🛢️ Loads cleaned data into **Redshift** table: `public.sales_data_team2`
+  - Loads cleaned data into **Redshift** table: `public.sales_data_team2`
 
 ---
 
-## 🧱 Project Structure
+## Project Structure
 
 ```
 ETL_Pipeline/
@@ -31,7 +31,7 @@ ETL_Pipeline/
 ├── README.md
 ```
 
-### 📂 `boto3_scripts/`
+### `boto3_scripts/`
 
 - `upload_data_to_s3.py` – Uploads sample data to S3
 - `upload_duplicate_file_to_s3.py` – Uploads multiple files to simulate 5GB data
@@ -42,7 +42,7 @@ ETL_Pipeline/
 
 ---
 
-## ⚙️ Tech Stack
+## Tech Stack
 
 | Service      | Usage                             |
 |--------------|------------------------------------|
@@ -54,7 +54,7 @@ ETL_Pipeline/
 
 ---
 
-## 🚧 Prerequisites
+## Prerequisites
 
 - AWS account with access to **S3, Glue, Redshift, IAM**
 - AWS CLI configured via `aws configure`
@@ -67,9 +67,9 @@ pip install boto3
 
 ---
 
-## 📦 Deployment Steps
+## Deployment Steps
 
-### 1. 🚀 Deploy Infrastructure via Terraform
+### 1. Deploy Infrastructure via Terraform
 
 ```bash
 cd terraform/
@@ -82,11 +82,11 @@ terraform apply -auto-approve
 > - Glue database, crawler, and ETL job
 > - Redshift cluster with IAM roles
 
-💡 *Edit `redshift.tf` if your VPC/Subnet IDs differ*
+*Edit `redshift.tf` if your VPC/Subnet IDs differ*
 
 ---
 
-### 2. 📥 Create Redshift Table
+### 2. Create Redshift Table
 
 Before running the pipeline, execute this SQL on Redshift:
 
@@ -107,14 +107,14 @@ CREATE TABLE public.sales_data_team2 (
 
 ---
 
-### 3. 🛠️ Run the ETL Pipeline
+### 3. Run the ETL Pipeline
 
-#### ✅ One-Click (End-to-End)
+#### One-Click (End-to-End)
 ```bash
 python boto3_scripts/main_filt_team2.py
 ```
 
-#### 🔍 Or Step-by-Step
+#### Or Step-by-Step
 
 ```bash
 # 1. Upload raw CSV to S3
@@ -132,7 +132,7 @@ python boto3_scripts/trigger_glue_job.py
 
 ---
 
-## 🧪 Validate in Redshift
+## Validate in Redshift
 
 Connect to Redshift and run:
 
@@ -155,7 +155,7 @@ SELECT COUNT(*) FROM public.sales_data_team2 WHERE order_date IS NULL;
 
 ---
 
-## 📚 Learnings & Highlights
+## Learnings & Highlights
 
 - Understood AWS Glue DPUs and runtime costing
 - Learned schema inference via Glue Crawlers
@@ -166,7 +166,7 @@ SELECT COUNT(*) FROM public.sales_data_team2 WHERE order_date IS NULL;
 
 ---
 
-## 💰 AWS Cost Summary (Estimation)
+## AWS Cost Summary (Estimation)
 
 | Component      | Usage                              | Estimated Cost |
 |----------------|------------------------------------|----------------|
