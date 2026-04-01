@@ -1,4 +1,4 @@
-# Team2 Batch ETL Pipeline
+# Batch ETL Pipeline
 
 This project builds an automated **Batch ETL Pipeline** using **AWS Glue + Redshift + Terraform** to process and load sales data from **Amazon S3 → AWS Glue (PySpark) → Amazon Redshift**.
 
